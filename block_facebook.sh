@@ -29,12 +29,7 @@
 # 4 - needs curl installed, everything else is probably installed by default, please install if something is missing (whois, perhaps ?)
 # 5 - will add iptables rules, blocking Facebook IPs obtained from "public" Facebook's ASNs
 # 6 - "should" be run from crontab on every boot; crontab has PATH somewhat limited, so PATH is defined
-# 7 - (in my use case) it runs from crontab with "@reboot /full/path/to/block_facebook.sh", so that it always gets fresh Facebook's Ips; check Google for editing crontab
-###################################################
-# Facebook's ASNs (AFAIK), dated 2018-04-17, obtained from https://bgpview.io/search/facebook
-#32934
-#54115
-#63293
+# 7 - in my use case, runs from crontab with "@reboot /full/path/to/block_facebook.sh", so that it always gets fresh Facebook's IPs; check Google for editing crontab
 ###################################################
 PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 if [ `id -u` -ne 0 ]; then # test if we are running as root; if not, exit
@@ -48,13 +43,17 @@ while [[ -z $test ]] # wait until beeing online
       sleep 1
    done 
 echo "online" # not needed if running from crontab
-for facebook_asn in $(curl -s https://bgpview.io/search/facebook | grep "https://bgpview.io/asn/" | sed 's: ::g' | cut -c 36-40) # very crude, depends on the HTML code, adapt if something changes
+#echo "************************" > /dev/shm/.block_facebook.txt
+for facebook_asn in $(curl -s https://bgpview.io/search/facebook | grep "https://bgpview.io/asn/" | sed 's: ::g' | cut -c 36-40  | cut -f1 -d"\"") # very crude, depends on the HTML code, adapt if something changes
    do
+#   echo "************************" >> /dev/shm/.block_facebook.txt
+#   echo "AS$facebook_asn" >> /dev/shm/.block_facebook.txt
       for facebook_ip_range in $(whois -H -h riswhois.ripe.net -- -F -K -i $facebook_asn | grep -v "^$" | grep -v "^%" | awk '{ print $2 }' | grep -v "::")
          do
             iptables -I INPUT 1 -s $facebook_ip_range -j REJECT # block for incoming
             iptables -I OUTPUT 1 -s $facebook_ip_range -j REJECT # block for outgoing
+#            echo "$facebook_ip_range" >> /dev/shm/.block_facebook.txt
          done
    done
-echo "iptables rules for blocking Facebook's IP ranges now added" # not needed if running from crontab
+echo "iptables rules for blocking Facebook IP ranges now added" # not needed if running from crontab
 exit 0
