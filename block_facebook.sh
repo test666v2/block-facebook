@@ -50,8 +50,8 @@ for facebook_asn in $(curl -s https://bgpview.io/search/facebook | grep "https:/
 #   echo "AS$facebook_asn" >> /dev/shm/.block_facebook.txt
       for facebook_ip_range in $(whois -H -h riswhois.ripe.net -- -F -K -i $facebook_asn | grep -v "^$" | grep -v "^%" | awk '{ print $2 }' | grep -v "::")
          do
-            iptables -I INPUT 1 -s $facebook_ip_range -j REJECT # block for incoming
-            iptables -I OUTPUT 1 -s $facebook_ip_range -j REJECT # block for outgoing
+            iptables -w -I INPUT 1 -s $facebook_ip_range -j REJECT # block for incoming
+            iptables -w -I OUTPUT 1 -s $facebook_ip_range -j REJECT # block for outgoing
 #            echo "$facebook_ip_range" >> /dev/shm/.block_facebook.txt
          done
    done
