@@ -10,7 +10,7 @@
  4 - needs curl installed, everything else is probably installed by default, please install if something is missing (whois, perhaps ?)<br/>
  5 - will add iptables rules, blocking Facebook IPs obtained from "public" Facebook's ASNs<br/>
  6 - "should" be run from crontab on every boot; crontab has PATH somewhat limited, so PATH is defined<br/>
- 7 - (in my use case) it runs from crontab with "@reboot /full/path/to/block_facebook.sh", so that it always gets fresh Facebook's Ips; check Google for editing crontab<br/>
+ 7 - (in my use case) it runs from crontab with "@reboot /full/path/to/block_facebook.sh", so that it always gets fresh Facebook's IPs; check Google for editing crontab<br/>
 <br/>
 Facebook's ASNs (AFAIK), dated 2018-04-17, obtained from https://bgpview.io/search/facebook<br/>
 32934<br/>
